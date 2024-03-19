@@ -1,0 +1,19 @@
+version: '3.4'
+
+services:
+  channelmanager.api:
+    image: remindme-channel_manager_api
+    container_name: ChannelManager-API
+    build:
+      context: .
+      dockerfile: ChannelManager.Api/Dockerfile
+    environment:
+      - ASPNETCORE_HTTP_PORTS=8080
+
+  channelmanager.worker:
+    image: remindme-channel_manager_worker
+    container_name: ChannelManager-WS
+    build:
+      context: .
+      dockerfile: ChannelManager.Worker/Dockerfile
+

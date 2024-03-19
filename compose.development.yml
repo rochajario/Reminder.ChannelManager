@@ -1,0 +1,39 @@
+version: '3.4'
+
+networks:
+  default:
+    driver: bridge
+    
+services:
+
+  channel-manager-api:
+    extends:
+      file: ./docker-compose.yml
+      service: channelmanager.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings:Database=server=${DB_HOST};database=ContentManagement;user=${DB_USER};password=${DB_PASSWORD}
+      - ConnectionStrings:RabbitMQ=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@RabbitMQ:5672/
+      - JwtKey=${JWT_KEY}
+      - Channels:Telegram=${TELEGRAM_KEY}
+
+  channel-manager-ws:
+    extends:
+      file: ./docker-compose.yml
+      service: channelmanager.worker
+    environment:
+      - DOTNET_ENVIRONMENT=Development
+      - ConnectionStrings:Database=server=${DB_HOST};database=ContentManagement;user=${DB_USER};password=${DB_PASSWORD}
+      - ConnectionStrings:RabbitMQ=amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@RabbitMQ:5672/
+      - JwtKey=${JWT_KEY}
+      - Channels:Telegram=${TELEGRAM_KEY}
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: RabbitMQ
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
